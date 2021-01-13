@@ -5,24 +5,22 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.phuture.instant.R;
 import com.phuture.instant.model.Article;
 
-import java.util.List;
+public class ArticleViewAdapter extends PagedListAdapter<Article, ArticleViewHolder> {
 
-public class ArticleViewAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
-
-    public static interface ArticleClickHandler {
-        public void onArticleClick(Article article);
-    }
-
-    private final List<Article> articles;
     private final ArticleClickHandler clickHandler;
 
-    public ArticleViewAdapter(List<Article> articles, ArticleClickHandler clickHandler) {
-        this.articles = articles;
+    public interface ArticleClickHandler {
+        void onArticleClick(Article article);
+    }
+
+    public ArticleViewAdapter(ArticleClickHandler clickHandler) {
+        super(DIFF_CALLBACK);
         this.clickHandler = clickHandler;
     }
 
@@ -35,21 +33,31 @@ public class ArticleViewAdapter extends RecyclerView.Adapter<ArticleViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(final @NonNull ArticleViewHolder holder, final int position) {
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clickHandler.onArticleClick(articles.get(position));
-            }
-        });
-        holder.article = articles.get(position);
-        holder.title.setText(articles.get(position).title);
-        holder.date.setText(articles.get(position).getFormatedDate());
-        holder.sourceTitle.setText(articles.get(position).sourceId);
+    public void onBindViewHolder(final @NonNull ArticleViewHolder holder, int position) {
+        Article article = getItem(position);
+        if (article!=null) {
+            holder.bindTo(article);
+            final Article viewArticle = getItem(position);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clickHandler.onArticleClick(viewArticle);
+                }
+            });
+        } else {
+            holder.clear();
+        }
     }
 
-    @Override
-    public int getItemCount() {
-        return articles.size();
-    }
+    private final static DiffUtil.ItemCallback<Article> DIFF_CALLBACK = new DiffUtil.ItemCallback<Article>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Article oldItem, @NonNull Article newItem) {
+            return oldItem.id.equals(newItem.id);
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Article oldItem, @NonNull Article newItem) {
+            return oldItem.equals(newItem);
+        }
+    };
 }

@@ -1,6 +1,7 @@
 package com.phuture.instant.model;
 
 
+import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -17,8 +18,8 @@ public interface ArticleDao {
     @Query("SELECT * FROM article WHERE source_id=:sourceId ORDER BY date DESC")
     List<Article> getAllBySource(String sourceId);
 
-    @Query("SELECT * FROM article ORDER BY date DESC LIMIT :from,:limit")
-    List<Article> getLatest(int from, int limit);
+    @Query("SELECT * FROM article ORDER BY date DESC")
+    DataSource.Factory<Integer, Article> getAllPaged();
 
     @Query("SELECT * FROM article WHERE id=:id LIMIT 1")
     Article get(String id);

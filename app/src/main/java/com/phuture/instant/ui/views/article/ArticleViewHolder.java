@@ -23,4 +23,20 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder {
         date = itemView.findViewById(R.id.publishedAt);
         sourceTitle = itemView.findViewById(R.id.sourceName);
     }
+
+    public void bindTo(Article article) {
+        this.article = article;
+
+        this.title.setText(this.article.title);
+        this.date.setText(this.article.getFormatedDate());
+        this.sourceTitle.setText(this.article.sourceId);
+    }
+
+    public void clear() {
+        this.article = null;
+
+        this.title.setText("");
+        this.date.setText("");
+        this.sourceTitle.setText("");
+    }
 }

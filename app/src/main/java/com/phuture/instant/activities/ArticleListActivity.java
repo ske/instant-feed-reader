@@ -3,6 +3,7 @@ package com.phuture.instant.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -23,6 +24,7 @@ import com.phuture.instant.model.Source;
 import com.phuture.instant.network.Downloader;
 import com.phuture.instant.network.IDownloadResult;
 import com.phuture.instant.ui.views.article.ArticleViewAdapter;
+import com.phuture.instant.ui.views.article.ArticleViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,8 +51,10 @@ public class ArticleListActivity extends AppCompatActivity implements IDownloadR
         String sourceId = getIntent().getStringExtra(PARAM_SOURCE_ID);
         src = Client.instance(this).getDb().sourceDao().get(sourceId);
 
-        adapter = new ArticleViewAdapter(this.articles, this);
         recyclerView = findViewById(R.id.list);
+        ArticleViewModel viewModel = new ViewModelProvider(this).get(ArticleViewModel.class);
+        adapter = new ArticleViewAdapter(this);
+        viewModel.articles.observe(this, adapter::submitList);
         recyclerView.setAdapter(adapter);
 
         Calendar c = Calendar.getInstance();
