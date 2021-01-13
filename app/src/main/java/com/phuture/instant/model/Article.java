@@ -1,0 +1,86 @@
+package com.phuture.instant.model;
+
+import android.content.Context;
+
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverter;
+import androidx.room.TypeConverters;
+
+import com.phuture.instant.db.Client;
+import com.phuture.instant.model.rss.Item;
+import com.phuture.instant.model.rss.Rss;
+import com.phuture.instant.parsers.RssParser;
+import com.phuture.instant.utils.MD5;
+import com.phuture.instant.utils.TimestampConverter;
+
+import java.util.Date;
+import java.util.List;
+
+@Entity(tableName = "article")
+public class Article {
+
+    @PrimaryKey(autoGenerate = false) @NonNull public String id;
+    @ColumnInfo(name = "title") public String title;
+    @ColumnInfo(name = "image") public String image;
+    @ColumnInfo(name = "source_id") public String sourceId;
+    @ColumnInfo(name = "date") @TypeConverters({TimestampConverter.class}) public Date date;
+    @ColumnInfo(name = "text") public String text;
+    @ColumnInfo(name = "url") public String url;
+    @ColumnInfo(name = "author") public String author;
+
+    // @Ignore protected Source source;
+
+    public Article(@NonNull String id) {
+        this.id = id;
+    }
+
+    public String getFormatedDate() {
+        return TimestampConverter.toStr(this.date);
+    }
+
+    protected Article(String title, String sourceId, String image, String date, String text, String url) {
+        this.id = MD5.get(url);
+        this.sourceId = sourceId;
+
+        this.title = title;
+        this.image = image;
+        this.date = TimestampConverter.fromTimestamp(date);
+        this.text = text;
+        this.url = url;
+    }
+
+    public static void storeFromXml(Context ctx, String sourceId, String xml) {
+        try {
+            RssParser parser = new RssParser(ctx, sourceId, xml);
+            Rss rss = parser.getResult();
+            List<Article> articles = parser.getArticles(rss);
+
+            for (Article article: articles) {
+                try {
+                    Client.instance(ctx).getDb().articleDao().insert(article);
+                } catch (Exception e) {
+                    System.out.println("store-article failed: " + e.getMessage());
+                }
+
+            }
+        } catch (Exception e) {
+            System.out.println("parse-store-source failed" + e.getMessage());
+        }
+    }
+
+    public static Article create(String sourceId, Item item) {
+        return new Article(
+                item.title,
+                sourceId,
+                null,
+                item.pubDate,
+                item.description,
+                item.link
+        );
+    }
+
+}

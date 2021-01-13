@@ -1,0 +1,39 @@
+package com.phuture.instant.activities;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
+import com.phuture.instant.R;
+
+public class WebViewActivity extends AppCompatActivity {
+
+    public static final String PARAM_URL = "url";
+    protected String url;
+    protected WebView webView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_web_view);
+        url = getIntent().getStringExtra(PARAM_URL);
+
+        webView = findViewById(R.id.webView);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (!TextUtils.isEmpty(view.getTitle())) {
+                    WebViewActivity.this.setTitle(view.getTitle());
+                }
+            }
+        });
+
+        webView.loadUrl(url);
+
+    }
+}
