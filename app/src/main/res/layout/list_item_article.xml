@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/item_text_size"
+        android:text="Article title"
         />
 
     <TextView
@@ -16,11 +17,14 @@
         android:layout_height="wrap_content"
         android:id="@+id/publishedAt"
         android:textSize="@dimen/item_published_at_size"
+        android:text="08:22 (01/21)"
         />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/sourceName"
         android:textSize="@dimen/item_published_at_size"
+        android:text="Source.com"
         />
 </LinearLayout>

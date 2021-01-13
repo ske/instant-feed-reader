@@ -17,6 +17,9 @@ public interface ArticleDao {
     @Query("SELECT * FROM article WHERE source_id=:sourceId ORDER BY date DESC")
     List<Article> getAllBySource(String sourceId);
 
+    @Query("SELECT * FROM article ORDER BY date DESC LIMIT :from,:limit")
+    List<Article> getLatest(int from, int limit);
+
     @Query("SELECT * FROM article WHERE id=:id LIMIT 1")
     Article get(String id);
 
