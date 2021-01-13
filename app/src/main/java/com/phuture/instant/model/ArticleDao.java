@@ -21,6 +21,9 @@ public interface ArticleDao {
     @Query("SELECT * FROM article ORDER BY date DESC")
     DataSource.Factory<Integer, Article> getAllPaged();
 
+    @Query("SELECT * FROM article WHERE source_id=:sourceId ORDER BY date DESC")
+    DataSource.Factory<Integer, Article> getAllBySourcePaged(String sourceId);
+
     @Query("SELECT * FROM article WHERE id=:id LIMIT 1")
     Article get(String id);
 

@@ -10,10 +10,12 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.phuture.instant.R;
 import com.phuture.instant.model.Article;
+import com.phuture.instant.model.Source;
 
 public class ArticleViewAdapter extends PagedListAdapter<Article, ArticleViewHolder> {
 
     private final ArticleClickHandler clickHandler;
+    private Source source;
 
     public interface ArticleClickHandler {
         void onArticleClick(Article article);

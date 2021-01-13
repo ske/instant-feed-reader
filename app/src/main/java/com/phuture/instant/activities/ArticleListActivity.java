@@ -20,11 +20,13 @@ import android.widget.TextView;
 import com.phuture.instant.R;
 import com.phuture.instant.db.Client;
 import com.phuture.instant.model.Article;
+import com.phuture.instant.model.ArticleDao;
 import com.phuture.instant.model.Source;
 import com.phuture.instant.network.Downloader;
 import com.phuture.instant.network.IDownloadResult;
 import com.phuture.instant.ui.views.article.ArticleViewAdapter;
 import com.phuture.instant.ui.views.article.ArticleViewModel;
+import com.phuture.instant.ui.views.article.ArticleViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,7 +40,6 @@ public class ArticleListActivity extends AppCompatActivity implements IDownloadR
     protected Source src;
     protected RecyclerView recyclerView;
     protected ArticleViewAdapter adapter;
-    protected List<Article> articles = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,11 @@ public class ArticleListActivity extends AppCompatActivity implements IDownloadR
         src = Client.instance(this).getDb().sourceDao().get(sourceId);
 
         recyclerView = findViewById(R.id.list);
-        ArticleViewModel viewModel = new ViewModelProvider(this).get(ArticleViewModel.class);
+
+        ArticleViewModelFactory viewModelFactory = new ArticleViewModelFactory(Client.instance(this).getDb().articleDao(), src);
+        ArticleViewModel viewModel = new ViewModelProvider(this, viewModelFactory).get(ArticleViewModel.class);
+
+                // new ViewModelProvider(this).get(ArticleViewModel.class);
         adapter = new ArticleViewAdapter(this);
         viewModel.articles.observe(this, adapter::submitList);
         recyclerView.setAdapter(adapter);
@@ -65,9 +70,9 @@ public class ArticleListActivity extends AppCompatActivity implements IDownloadR
             // refresh if the source was downloaded more then 10 min before
             Downloader.execute(this, src.url, src, this);
         } else {
-            articles.clear();
-            articles.addAll(Client.instance(this).getDb().articleDao().getAllBySource(src.id));
-            adapter.notifyDataSetChanged();
+            // articles.clear();
+            // articles.addAll(Client.instance(this).getDb().articleDao().getAllBySource(src.id));
+            // adapter.notifyDataSetChanged();
         }
 
         ArticleListActivity.this.setTitle(src.name);
@@ -80,17 +85,17 @@ public class ArticleListActivity extends AppCompatActivity implements IDownloadR
         // TODO hibakezeles, ha hiba van
 
         Article.storeFromXml(this, src.id, result);
-        articles.clear();
-        articles.addAll(Client.instance(this).getDb().articleDao().getAllBySource(src.id));
+        // articles.clear();
+        // articles.addAll(Client.instance(this).getDb().articleDao().getAllBySource(src.id));
 
-        if (articles.size() > 0) {
+        //if (articles.size() > 0) {
             // Update src with last refresh date
             src.lastRefresh = new Date();
             Client.instance(this).getDb().sourceDao().update(src);
-        }
+        //}
 
         // request refresh the listview
-        adapter.notifyDataSetChanged();
+        //adapter.notifyDataSetChanged();
     }
 
     @Override
