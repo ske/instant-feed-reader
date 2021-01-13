@@ -19,6 +19,7 @@ import com.phuture.instant.utils.TimestampConverter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(tableName = "article")
 public class Article {
@@ -83,4 +84,23 @@ public class Article {
         );
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Article article = (Article) o;
+        return id.equals(article.id) &&
+                Objects.equals(title, article.title) &&
+                Objects.equals(image, article.image) &&
+                Objects.equals(sourceId, article.sourceId) &&
+                Objects.equals(date, article.date) &&
+                Objects.equals(text, article.text) &&
+                Objects.equals(url, article.url) &&
+                Objects.equals(author, article.author);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, image, sourceId, date, text, url, author);
+    }
 }
