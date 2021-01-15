@@ -1,15 +1,11 @@
 package com.phuture.instant.ui.fragments;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.icu.util.BuddhistCalendar;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.phuture.instant.R;
 import com.phuture.instant.activities.WebViewActivity;
+import com.phuture.instant.db.Cache;
 import com.phuture.instant.db.Client;
 import com.phuture.instant.model.Article;
 import com.phuture.instant.model.Source;
@@ -76,12 +73,11 @@ public class ArticleListFragment extends Fragment implements AdapterView.OnItemC
 
     protected void populateData() {
         // FIXME implement a simple k-v cache
-        SharedPreferences prefs = getContext().getSharedPreferences("cache", Context.MODE_PRIVATE);
-        long lastRefresh = 0;
+        long lastRefresh = -1;
         if (sourceId != null) {
-            lastRefresh = prefs.getLong("lastrefresh_" + sourceId, 0);
+            lastRefresh = Cache.instance(getContext()).getLong("lastrefresh_" + sourceId);
         } else {
-            lastRefresh = prefs.getLong("lastrefresh_all", 0);
+            lastRefresh = Cache.instance(getContext()).getLong("lastrefresh_all");
         }
 
         if (lastRefresh > this.lastRefresh) {

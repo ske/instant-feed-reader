@@ -1,7 +1,5 @@
 package com.phuture.instant.activities;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -10,6 +8,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.phuture.instant.R;
+import com.phuture.instant.db.Cache;
 import com.phuture.instant.db.Client;
 import com.phuture.instant.model.Article;
 import com.phuture.instant.model.Source;
@@ -99,21 +98,15 @@ public class FeedTabsActivity extends AppCompatActivity implements IDownloadResu
             src.lastRefresh = new Date();
             Client.instance(this).getDb().sourceDao().update(src);
 
-            // FIXME implement a simple k-v cache
-            SharedPreferences prefs = getSharedPreferences("cache", Context.MODE_PRIVATE);
-            SharedPreferences.Editor eprefs = prefs.edit();
-            eprefs.putLong("lastrefresh_" + src.id, src.lastRefresh.getTime());
-            eprefs.apply();
+            Cache.instance(getApplicationContext()).set("lastrefresh_" + src.id, src.lastRefresh.getTime());
+
             if (src.lastRefresh.getTime() > lastRefreshAll) {
                 lastRefreshAll = src.lastRefresh.getTime();
             }
         }
 
         if (lastRefreshAll>0) {
-            SharedPreferences prefs = getSharedPreferences("cache", Context.MODE_PRIVATE);
-            SharedPreferences.Editor eprefs = prefs.edit();
-            eprefs.putLong("lastrefresh_all", lastRefreshAll);
-            eprefs.apply();
+            Cache.instance(getApplicationContext()).set("lastrefresh_all", src.lastRefresh.getTime());
         }
 
         downloaded++;
