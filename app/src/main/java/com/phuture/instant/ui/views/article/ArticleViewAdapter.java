@@ -11,19 +11,21 @@ import androidx.recyclerview.widget.DiffUtil;
 import com.phuture.instant.R;
 import com.phuture.instant.model.Article;
 import com.phuture.instant.model.Source;
+import com.phuture.instant.ui.data.ISourceResolver;
 
 public class ArticleViewAdapter extends PagedListAdapter<Article, ArticleViewHolder> {
 
     private final ArticleClickHandler clickHandler;
-    private Source source;
+    private final ISourceResolver sourceResolver;
 
     public interface ArticleClickHandler {
         void onArticleClick(Article article);
     }
 
-    public ArticleViewAdapter(ArticleClickHandler clickHandler) {
+    public ArticleViewAdapter(ArticleClickHandler clickHandler, ISourceResolver sourceResolver) {
         super(DIFF_CALLBACK);
         this.clickHandler = clickHandler;
+        this.sourceResolver = sourceResolver;
     }
 
     @NonNull
@@ -31,7 +33,8 @@ public class ArticleViewAdapter extends PagedListAdapter<Article, ArticleViewHol
     public ArticleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_article, parent, false);
-        return new ArticleViewHolder(view);
+
+        return new ArticleViewHolder(view, sourceResolver);
     }
 
     @Override

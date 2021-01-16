@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +20,7 @@ import com.phuture.instant.activities.WebViewActivity;
 import com.phuture.instant.db.Client;
 import com.phuture.instant.model.Article;
 import com.phuture.instant.model.Source;
+import com.phuture.instant.ui.data.ISourceResolver;
 import com.phuture.instant.ui.views.article.ArticleViewAdapter;
 import com.phuture.instant.ui.views.article.ArticleViewModel;
 import com.phuture.instant.ui.views.article.ArticleViewModelFactory;
@@ -27,7 +29,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ArticleListFragment extends Fragment implements ArticleViewAdapter.ArticleClickHandler {
+public class ArticleListFragment extends Fragment implements ArticleViewAdapter.ArticleClickHandler,
+        ISourceResolver {
 
     public static final String PARAM_SOURCE_ID = "sourceId";
 
@@ -37,6 +40,12 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
     protected RecyclerView recyclerView;
     protected ArticleViewAdapter viewAdapter;
     protected ArticleViewModel viewModel;
+
+    LinearLayoutManager rvLayoutManager;
+    DividerItemDecoration rvDivider;
+    Parcelable listViewState;
+
+
 
     public ArticleListFragment() {
     }
@@ -66,7 +75,7 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
 
         Source src = this.sourceMap.get(sourceId);
 
-        viewAdapter = new ArticleViewAdapter(this);
+        viewAdapter = new ArticleViewAdapter(this, this);
 
         ArticleViewModelFactory viewModelFactory = new ArticleViewModelFactory(
                 Client.instance(getContext()).getDb().articleDao(),
@@ -76,9 +85,6 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
         viewModel = new ViewModelProvider(this, viewModelFactory).get(ArticleViewModel.class);
         viewModel.articles.observe(this, viewAdapter::submitList);
     }
-
-    LinearLayoutManager rvLayoutManager;
-    Parcelable listViewState;
 
     @Override
     public void onPause() {
@@ -101,16 +107,14 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_article_list, container, false);
 
-        rvLayoutManager = new LinearLayoutManager(getContext());
         recyclerView = root.findViewById(R.id.listView);
+
+        rvLayoutManager = new LinearLayoutManager(getContext());
+        rvDivider = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
+
         recyclerView.setAdapter(viewAdapter);
         recyclerView.setLayoutManager(rvLayoutManager);
-
-        if (viewAdapter.getCurrentList() != null) {
-            System.out.println("Current list size: " + viewAdapter.getCurrentList().size());
-        } else {
-            System.out.println("No list found on viewAdapter");
-        }
+        recyclerView.addItemDecoration(rvDivider);
 
         return root;
     }
@@ -122,4 +126,8 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
         startActivity(webView);
     }
 
+    @Override
+    public Source getSourceById(String sourceId) {
+        return sourceMap.get(sourceId);
+    }
 }

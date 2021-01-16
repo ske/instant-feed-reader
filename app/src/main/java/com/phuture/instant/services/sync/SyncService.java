@@ -16,6 +16,9 @@ public class SyncService extends Service {
 
     public static final String PARAM_SOURCE_ID_LIST = "sourceIdList";
 
+    public static String BROADCAST_SYNC_FINISHED = "com.phuture.servicetest.services.SyncService.SYNC_FINISHED";
+    public static String BROADCAST_SYNC_STARTED = "com.phuture.servicetest.services.SyncService.SYNC_STARTED";
+
     protected ExecutorService executor;
 
     final Object lock = new Object();
@@ -35,9 +38,11 @@ public class SyncService extends Service {
     private void startSync(final String[] sourcesToSync) {
         synchronized (lock) {
 
-            Toast.makeText(getApplicationContext(), "Sync", Toast.LENGTH_SHORT).show();
-
             final long start = System.currentTimeMillis();
+
+            Intent notify = new Intent();
+            notify.setAction(BROADCAST_SYNC_STARTED);
+            sendBroadcast(notify);
 
             ISyncTaskParams params = new ISyncTaskParams() {
                 @Override
@@ -50,7 +55,11 @@ public class SyncService extends Service {
                 public void onResult(ISyncResult result) {
                     long elapsed = System.currentTimeMillis() - start;
                     System.out.println("Sync completed, elapsed time in milliseconds: " + elapsed);
-                    Toast.makeText(getApplicationContext(), "Sync OK", Toast.LENGTH_SHORT).show();
+
+                    Intent notify = new Intent();
+                    notify.setAction(BROADCAST_SYNC_FINISHED);
+                    sendBroadcast(notify);
+
                     stopSelf();
                 }
             };

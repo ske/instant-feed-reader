@@ -8,17 +8,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.phuture.instant.R;
 import com.phuture.instant.model.Article;
+import com.phuture.instant.model.Source;
+import com.phuture.instant.ui.data.ISourceResolver;
 
 public class ArticleViewHolder extends RecyclerView.ViewHolder {
 
     protected TextView title;
     protected TextView date;
     protected TextView sourceTitle;
+    private ISourceResolver sourceResolver;
 
     public Article article;
 
-    public ArticleViewHolder(@NonNull View itemView) {
+    public ArticleViewHolder(@NonNull View itemView, ISourceResolver sourceResolver) {
         super(itemView);
+        this.sourceResolver = sourceResolver;
+
         title = itemView.findViewById(R.id.title);
         date = itemView.findViewById(R.id.publishedAt);
         sourceTitle = itemView.findViewById(R.id.sourceName);
@@ -29,7 +34,10 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder {
 
         this.title.setText(this.article.title);
         this.date.setText(this.article.getFormatedDate());
-        this.sourceTitle.setText(this.article.sourceId);
+
+        Source source = this.sourceResolver.getSourceById(this.article.sourceId);
+
+        this.sourceTitle.setText(source.name);
     }
 
     public void clear() {
