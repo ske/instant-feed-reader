@@ -54,7 +54,17 @@ public class Article {
         this.url = url;
     }
 
-    public static void storeFromXml(Context ctx, String sourceId, String xml) {
+    public interface IArticleStoreStatus {
+        Exception getXmlError();
+        int getTotalArticles();
+        int getNewArticles();
+    }
+
+    public static IArticleStoreStatus storeFromXml(Context ctx, String sourceId, String xml) {
+        Exception _xmlError = null;
+        int _newArticles = 0;
+        int _totalArticles = 0;
+
         try {
             RssParser parser = new RssParser(ctx, sourceId, xml);
             Rss rss = parser.getResult();
@@ -63,14 +73,40 @@ public class Article {
             for (Article article: articles) {
                 try {
                     Client.instance(ctx).getDb().articleDao().insert(article);
+                    _newArticles++;
                 } catch (Exception e) {
+                    // Duplicate or erroneous article
                     System.out.println("store-article failed: " + e.getMessage());
                 }
-
+                _totalArticles++;
             }
         } catch (Exception e) {
+            _xmlError = e;
             System.out.println("parse-store-source failed" + e.getMessage());
         }
+
+        // Assembly the status response
+        final Exception xmlError = _xmlError;
+        final int newArticles = _newArticles;
+        final int totalArticles = _totalArticles;
+
+        return new IArticleStoreStatus() {
+            @Override
+            public Exception getXmlError() {
+                return xmlError;
+            }
+
+            @Override
+            public int getTotalArticles() {
+                return totalArticles;
+            }
+
+            @Override
+            public int getNewArticles() {
+                return newArticles;
+            }
+        };
+
     }
 
     public static Article create(String sourceId, Item item) {

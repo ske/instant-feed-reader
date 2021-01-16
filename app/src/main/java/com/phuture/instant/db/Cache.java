@@ -3,6 +3,8 @@ package com.phuture.instant.db;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Set;
+
 public class Cache {
 
     public static final String STORAGE_KEY = "cache";
@@ -19,6 +21,11 @@ public class Cache {
         return prefs.contains(key);
     }
 
+    public Set<String> getStringSet(String key) {
+        SharedPreferences prefs = ctx.getSharedPreferences(STORAGE_KEY, Context.MODE_PRIVATE);
+        return prefs.getStringSet(key, null);
+    }
+
     public String getString(String key) {
         SharedPreferences prefs = ctx.getSharedPreferences(STORAGE_KEY, Context.MODE_PRIVATE);
         return prefs.getString(key, null);
@@ -27,6 +34,15 @@ public class Cache {
     public Long getLong(String key) {
         SharedPreferences prefs = ctx.getSharedPreferences(STORAGE_KEY, Context.MODE_PRIVATE);
         return prefs.getLong(key, -1);
+    }
+
+    public Cache set(String key, Set<String> value) {
+        SharedPreferences prefs = ctx.getSharedPreferences(STORAGE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor eprefs = prefs.edit();
+        eprefs.putStringSet(key, value);
+        eprefs.apply();
+
+        return this;
     }
 
     public Cache set(String key, Long value) {

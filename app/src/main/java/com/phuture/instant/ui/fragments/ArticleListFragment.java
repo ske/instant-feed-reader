@@ -11,17 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.phuture.instant.R;
 import com.phuture.instant.activities.WebViewActivity;
-import com.phuture.instant.db.Cache;
 import com.phuture.instant.db.Client;
 import com.phuture.instant.model.Article;
 import com.phuture.instant.model.Source;
-import com.phuture.instant.ui.data.SourceDescriptor;
 import com.phuture.instant.ui.views.article.ArticleViewAdapter;
 import com.phuture.instant.ui.views.article.ArticleViewModel;
 import com.phuture.instant.ui.views.article.ArticleViewModelFactory;
@@ -104,10 +101,7 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_article_list, container, false);
 
-        if (rvLayoutManager==null) {
-            rvLayoutManager = new LinearLayoutManager(getContext());
-        }
-
+        rvLayoutManager = new LinearLayoutManager(getContext());
         recyclerView = root.findViewById(R.id.listView);
         recyclerView.setAdapter(viewAdapter);
         recyclerView.setLayoutManager(rvLayoutManager);
