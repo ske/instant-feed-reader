@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +40,12 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
     protected RecyclerView recyclerView;
     protected ArticleViewAdapter viewAdapter;
     protected ArticleViewModel viewModel;
+
+    LinearLayoutManager rvLayoutManager;
+    DividerItemDecoration rvDivider;
+    Parcelable listViewState;
+
+
 
     public ArticleListFragment() {
     }
@@ -79,9 +86,6 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
         viewModel.articles.observe(this, viewAdapter::submitList);
     }
 
-    LinearLayoutManager rvLayoutManager;
-    Parcelable listViewState;
-
     @Override
     public void onPause() {
         super.onPause();
@@ -103,16 +107,14 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_article_list, container, false);
 
-        rvLayoutManager = new LinearLayoutManager(getContext());
         recyclerView = root.findViewById(R.id.listView);
+
+        rvLayoutManager = new LinearLayoutManager(getContext());
+        rvDivider = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
+
         recyclerView.setAdapter(viewAdapter);
         recyclerView.setLayoutManager(rvLayoutManager);
-
-        if (viewAdapter.getCurrentList() != null) {
-            System.out.println("Current list size: " + viewAdapter.getCurrentList().size());
-        } else {
-            System.out.println("No list found on viewAdapter");
-        }
+        recyclerView.addItemDecoration(rvDivider);
 
         return root;
     }
