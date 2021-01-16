@@ -38,10 +38,10 @@ public class TimestampConverter {
         if (value != null) {
             try {
                 return rssDateFormat.parse(value);
-            } catch (ParseException e) {
+            } catch (Exception e) {
                 try {
                     return dbDateFormat.parse(value);
-                } catch (ParseException e2) {
+                } catch (Exception e2) {
                 }
             }
             return null;
