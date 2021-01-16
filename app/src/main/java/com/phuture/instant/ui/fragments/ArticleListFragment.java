@@ -2,15 +2,18 @@ package com.phuture.instant.ui.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.paging.PagedList;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.phuture.instant.R;
 import com.phuture.instant.activities.WebViewActivity;
@@ -18,25 +21,25 @@ import com.phuture.instant.db.Cache;
 import com.phuture.instant.db.Client;
 import com.phuture.instant.model.Article;
 import com.phuture.instant.model.Source;
-import com.phuture.instant.ui.data.ArticleViewAdapter;
 import com.phuture.instant.ui.data.SourceDescriptor;
+import com.phuture.instant.ui.views.article.ArticleViewAdapter;
+import com.phuture.instant.ui.views.article.ArticleViewModel;
+import com.phuture.instant.ui.views.article.ArticleViewModelFactory;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ArticleListFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class ArticleListFragment extends Fragment implements ArticleViewAdapter.ArticleClickHandler {
 
     public static final String PARAM_SOURCE_ID = "sourceId";
 
-    protected SourceDescriptor descriptor;
-    protected ListView listView;
-    protected List<Article> data = new ArrayList<>();
-    protected ArticleViewAdapter adapter;
     protected Map<String, Source> sourceMap;
     protected String sourceId;
-    protected long lastRefresh = 0;
+
+    protected RecyclerView recyclerView;
+    protected ArticleViewAdapter viewAdapter;
+    protected ArticleViewModel viewModel;
 
     public ArticleListFragment() {
     }
@@ -63,60 +66,66 @@ public class ArticleListFragment extends Fragment implements AdapterView.OnItemC
         for (Source src: sources) {
             sourceMap.put(src.id, src);
         }
+
+        Source src = this.sourceMap.get(sourceId);
+
+        viewAdapter = new ArticleViewAdapter(this);
+
+        ArticleViewModelFactory viewModelFactory = new ArticleViewModelFactory(
+                Client.instance(getContext()).getDb().articleDao(),
+                src
+        );
+
+        viewModel = new ViewModelProvider(this, viewModelFactory).get(ArticleViewModel.class);
+        viewModel.articles.observe(this, viewAdapter::submitList);
+    }
+
+    LinearLayoutManager rvLayoutManager;
+    Parcelable listViewState;
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            listViewState = recyclerView.getLayoutManager().onSaveInstanceState();
+        } catch (Exception e) {}
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        populateData();
-    }
-
-    protected void populateData() {
-        // FIXME implement a simple k-v cache
-        long lastRefresh = -1;
-        if (sourceId != null) {
-            lastRefresh = Cache.instance(getContext()).getLong("lastrefresh_" + sourceId);
-        } else {
-            lastRefresh = Cache.instance(getContext()).getLong("lastrefresh_all");
-        }
-
-        if (lastRefresh > this.lastRefresh) {
-            List<Article> data = null;
-            if (sourceId==null) {
-                data = Client.instance(getContext()).getDb().articleDao().getAll();
-            } else {
-                data = Client.instance(getContext()).getDb().articleDao().getAllBySource(sourceId);
-            }
-
-            this.data.clear();
-            this.data.addAll(data);
-            adapter.notifyDataSetChanged();
-
-            System.out.println("last-refresh-change updating, " + lastRefresh + " vs " + this.lastRefresh);
-            this.lastRefresh = lastRefresh;
-        }
+        try {
+            recyclerView.getLayoutManager().onRestoreInstanceState(listViewState);
+        } catch (Exception e) {}
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_article_list, container, false);
-        listView = root.findViewById(R.id.listView);
 
-        adapter = new ArticleViewAdapter(getContext(), data, sourceMap);
-        listView.setAdapter(adapter);
-        populateData();
-        listView.setOnItemClickListener(this);
+        if (rvLayoutManager==null) {
+            rvLayoutManager = new LinearLayoutManager(getContext());
+        }
+
+        recyclerView = root.findViewById(R.id.listView);
+        recyclerView.setAdapter(viewAdapter);
+        recyclerView.setLayoutManager(rvLayoutManager);
+
+        if (viewAdapter.getCurrentList() != null) {
+            System.out.println("Current list size: " + viewAdapter.getCurrentList().size());
+        } else {
+            System.out.println("No list found on viewAdapter");
+        }
 
         return root;
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Article article = adapter.getItem(position);
-        String url = article.url;
+    public void onArticleClick(Article article) {
         Intent webView = new Intent(getContext(), WebViewActivity.class);
         webView.putExtra(WebViewActivity.PARAM_URL, article.url);
         startActivity(webView);
     }
+
 }

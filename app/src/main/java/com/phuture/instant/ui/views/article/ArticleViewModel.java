@@ -21,9 +21,14 @@ public class ArticleViewModel extends ViewModel {
     public ArticleViewModel(ArticleDao articleDao, Source source) {
         this.articleDao = articleDao;
         if (source!=null) {
-            articles = new LivePagedListBuilder<>(articleDao.getAllBySourcePaged(source.id), getPageSize()).build();
+            articles = new LivePagedListBuilder<>(this.articleDao.getAllBySourcePaged(source.id), getPageSize()).build();
         } else {
-            articles = new LivePagedListBuilder<>(articleDao.getAllPaged(), getPageSize()).build();
+            articles = new LivePagedListBuilder<>(this.articleDao.getAllPaged(), getPageSize()).build();
         }
     }
+
+    public LiveData<PagedList<Article>> getLiveData() {
+        return articles;
+    }
+
 }

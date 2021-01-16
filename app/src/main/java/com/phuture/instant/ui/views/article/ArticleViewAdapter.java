@@ -51,7 +51,7 @@ public class ArticleViewAdapter extends PagedListAdapter<Article, ArticleViewHol
         }
     }
 
-    private final static DiffUtil.ItemCallback<Article> DIFF_CALLBACK = new DiffUtil.ItemCallback<Article>() {
+    private static DiffUtil.ItemCallback<Article> DIFF_CALLBACK = new DiffUtil.ItemCallback<Article>() {
         @Override
         public boolean areItemsTheSame(@NonNull Article oldItem, @NonNull Article newItem) {
             return oldItem.id.equals(newItem.id);
