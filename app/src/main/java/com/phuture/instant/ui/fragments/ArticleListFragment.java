@@ -19,6 +19,7 @@ import com.phuture.instant.activities.WebViewActivity;
 import com.phuture.instant.db.Client;
 import com.phuture.instant.model.Article;
 import com.phuture.instant.model.Source;
+import com.phuture.instant.ui.data.ISourceResolver;
 import com.phuture.instant.ui.views.article.ArticleViewAdapter;
 import com.phuture.instant.ui.views.article.ArticleViewModel;
 import com.phuture.instant.ui.views.article.ArticleViewModelFactory;
@@ -27,7 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ArticleListFragment extends Fragment implements ArticleViewAdapter.ArticleClickHandler {
+public class ArticleListFragment extends Fragment implements ArticleViewAdapter.ArticleClickHandler,
+        ISourceResolver {
 
     public static final String PARAM_SOURCE_ID = "sourceId";
 
@@ -66,7 +68,7 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
 
         Source src = this.sourceMap.get(sourceId);
 
-        viewAdapter = new ArticleViewAdapter(this);
+        viewAdapter = new ArticleViewAdapter(this, this);
 
         ArticleViewModelFactory viewModelFactory = new ArticleViewModelFactory(
                 Client.instance(getContext()).getDb().articleDao(),
@@ -122,4 +124,8 @@ public class ArticleListFragment extends Fragment implements ArticleViewAdapter.
         startActivity(webView);
     }
 
+    @Override
+    public Source getSourceById(String sourceId) {
+        return sourceMap.get(sourceId);
+    }
 }
