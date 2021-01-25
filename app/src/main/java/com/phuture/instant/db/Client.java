@@ -37,9 +37,13 @@ public class Client extends RoomDatabase.Callback {
 
     protected void populateBaseData() {
         try {
-            db.sourceDao().insert(new Source("hang_hu","hang.hu", "https://hang.hu/feed/"));
+            db.sourceDao().insert(new Source("hang_hu","hang.hu", "https://hang.hu/feed"));
             db.sourceDao().insert(new Source("444_hu", "444.hu", "https://444.hu/feed"));
             db.sourceDao().insert(new Source("azonnali_hu", "azonnali.hu", "https://azonnali.hu/rss"));
+
+            db.sourceDao().insert(new Source("telex_hu","telex.hu", "https://telex.hu/rss"));
+            db.sourceDao().insert(new Source("hvg_hu", "hvg.hu", "https://hvg.hu/rss"));
+            db.sourceDao().insert(new Source("media1_hu", "media1.hu", "https://media1.hu/feed"));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

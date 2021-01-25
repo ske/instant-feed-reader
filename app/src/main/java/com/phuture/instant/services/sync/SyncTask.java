@@ -2,6 +2,7 @@ package com.phuture.instant.services.sync;
 
 import android.content.Context;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
@@ -92,13 +93,10 @@ public class SyncTask implements ISyncTask, VolleyResponseListener {
 
             // Initialize request and add to the queue
             VolleyRequest request = new VolleyRequest(source.url, this);
-
+            request.setRetryPolicy(new DefaultRetryPolicy( 50000, 5, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             request.setTag(source);
             queue.add(request);
         }
-
-        // Start the queue
-        queue.start();
     }
 
     @Override
