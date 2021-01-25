@@ -80,6 +80,11 @@ public class Article {
                 }
                 _totalArticles++;
             }
+
+            Source source = Client.instance(ctx).getDb().sourceDao().get(sourceId);
+            source.lastRefresh = new Date();
+            Client.instance(ctx).getDb().sourceDao().update(source);
+
         } catch (Exception e) {
             _xmlError = e;
             System.out.println("parse-store-source failed" + e.getMessage());
@@ -109,14 +114,19 @@ public class Article {
 
     }
 
+    static String cleanText(String txt) {
+        if (txt == null) return null;
+        return txt.trim();
+    }
+
     public static Article create(String sourceId, Item item) {
         return new Article(
-                item.title,
+                cleanText(item.title),
                 sourceId,
                 null,
-                item.pubDate,
-                item.description,
-                item.link
+                cleanText(item.pubDate),
+                cleanText(item.description),
+                cleanText(item.link)
         );
     }
 

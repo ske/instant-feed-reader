@@ -93,6 +93,9 @@ public class FeedTabsActivity extends AppCompatActivity {
             _set.add("444_hu");
             _set.add("azonnali_hu");
             _set.add("hang_hu");
+            _set.add("telex_hu");
+            _set.add("hvg_hu");
+            _set.add("media1_hu");
             Cache.instance(ctx).set("refresh_sources", _set);
         }
 

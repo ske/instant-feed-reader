@@ -40,6 +40,7 @@
             android:background="?attr/colorPrimary"
             app:tabTextColor="@color/white"
             app:tabIndicatorColor="@color/white"
+            app:tabMode="scrollable"
             />
     </com.google.android.material.appbar.AppBarLayout>
 

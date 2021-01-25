@@ -5,6 +5,9 @@ This app can be used to read the latest news from the following media outlets in
 * 444.hu
 * azonnali.hu
 * hang.hu
+* telex.hu
+* hvg.hu
+* media1.hu
 
 
 TODO:

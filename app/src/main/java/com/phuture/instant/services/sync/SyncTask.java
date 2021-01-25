@@ -11,7 +11,11 @@ import com.phuture.instant.model.Source;
 import com.phuture.instant.services.sync.volley.VolleyRequest;
 import com.phuture.instant.services.sync.volley.VolleyResponseListener;
 
+import java.net.HttpURLConnection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SyncTask implements ISyncTask, VolleyResponseListener {
@@ -20,6 +24,7 @@ public class SyncTask implements ISyncTask, VolleyResponseListener {
     private ISyncTaskParams params;
     private ISyncTaskResultHandler handler;
     private Context ctx;
+    private RequestQueue queue;
 
     private Map<Source, Object> status;
     private int activeRequests = -1;
@@ -70,9 +75,13 @@ public class SyncTask implements ISyncTask, VolleyResponseListener {
     }
 
     private void fetchSources() {
-        RequestQueue queue = Volley.newRequestQueue(ctx);
+        queue = Volley.newRequestQueue(ctx);
         // Add request to the queue
-        for (String sourceId: params.getSourceIdList()) {
+
+        List<String> sourceIds = params.getSourceIdList();
+        Collections.sort(sourceIds);
+
+        for (String sourceId: sourceIds) {
             Source source = Client.instance(ctx).getDb().sourceDao().get(sourceId);
             if (source == null) continue;
 
@@ -83,6 +92,7 @@ public class SyncTask implements ISyncTask, VolleyResponseListener {
 
             // Initialize request and add to the queue
             VolleyRequest request = new VolleyRequest(source.url, this);
+
             request.setTag(source);
             queue.add(request);
         }

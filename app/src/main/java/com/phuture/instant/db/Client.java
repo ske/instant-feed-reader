@@ -7,6 +7,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.phuture.instant.db.migrations.AddNewSources20200115;
 import com.phuture.instant.model.Source;
 
 public class Client extends RoomDatabase.Callback {
@@ -18,12 +19,17 @@ public class Client extends RoomDatabase.Callback {
 
     private Client(Context ctx) {
         this.ctx = ctx;
+
+        final AddNewSources20200115 migration1_2 = new AddNewSources20200115();
+
         db = Room.databaseBuilder(ctx, Database.class, "instant")
                 .allowMainThreadQueries() // FIXME should remove this and do db ops async
                 .addCallback(this)
+                .addMigrations(migration1_2)
                 .build();
 
         db.sourceDao().getAll();
+
         if (firstInit) {
             populateBaseData();
         }

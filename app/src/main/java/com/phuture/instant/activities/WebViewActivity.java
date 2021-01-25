@@ -9,6 +9,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.phuture.instant.R;
 
@@ -19,6 +20,7 @@ public class WebViewActivity extends AppCompatActivity {
     protected String url;
     protected WebView webView;
     protected ProgressBar progressBar;
+    protected TextView title;
 
     void showProgressBar(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
@@ -29,6 +31,7 @@ public class WebViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
         progressBar = findViewById(R.id.progress_bar);
+        title = findViewById(R.id.title);
 
         showProgressBar(true);
 
@@ -40,6 +43,7 @@ public class WebViewActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 if (!TextUtils.isEmpty(view.getTitle())) {
                     WebViewActivity.this.setTitle(view.getTitle());
+                    title.setText(view.getTitle());
                 }
                 showProgressBar(false);
             }

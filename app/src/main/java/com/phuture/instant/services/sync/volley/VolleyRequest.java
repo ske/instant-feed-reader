@@ -4,6 +4,7 @@ import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -11,6 +12,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Custom Request class based on StringRequest to pass 'Tag' to the response listener
@@ -30,6 +34,13 @@ public class VolleyRequest extends Request<String> {
     }
 
     @Override
+    public Map<String, String> getHeaders() throws AuthFailureError {
+        Map<String, String> headers = new HashMap<String, String>();
+        headers.put("User-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0");
+        return headers;
+    }
+
+    @Override
     protected void deliverResponse(String response) {
         VolleyResponseListener listener;
         synchronized (mLock) {
@@ -42,6 +53,7 @@ public class VolleyRequest extends Request<String> {
 
     @Override
     public void deliverError(VolleyError error) {
+        // Otherwise dispatch the error
         VolleyResponseListener listener;
         synchronized (mLock) {
             listener = this.listener;

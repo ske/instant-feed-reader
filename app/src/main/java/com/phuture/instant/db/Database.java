@@ -11,7 +11,7 @@ import com.phuture.instant.model.ArticleDao;
 import com.phuture.instant.model.Source;
 import com.phuture.instant.model.SourceDao;
 
-@androidx.room.Database(entities = {Article.class, Source.class}, version = 1)
+@androidx.room.Database(entities = {Article.class, Source.class}, version = 2)
 public abstract class Database extends RoomDatabase {
     public abstract SourceDao sourceDao();
     public abstract ArticleDao articleDao();
